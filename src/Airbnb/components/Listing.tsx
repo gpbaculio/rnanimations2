@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { useNavigation } from "react-navigation-hooks";
@@ -58,18 +58,24 @@ interface ListingProps {
 }
 
 export default ({ listing }: ListingProps) => {
-  const { navigate } = useNavigation();
+  const [opacity, setOpacity] = useState(1);
+  const { navigate, isFocused } = useNavigation();
+  const hasFocus = isFocused();
+  useEffect(() => {
+    if (hasFocus) setOpacity(1);
+  }, [hasFocus]);
   return (
     <View key={listing.id} style={styles.listing}>
       <TouchableWithoutFeedback
         onPress={() => {
+          setOpacity(0);
           navigate("Listing", { listing });
         }}
       >
         <View>
           <SharedElement id={listing.id}>
             <Image
-              style={styles.image}
+              style={[styles.image, { opacity }]}
               resizeMode="cover"
               source={listing.picture}
             />

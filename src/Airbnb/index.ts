@@ -20,8 +20,17 @@ export default createSharedElementStackNavigator(
     Listing
   },
   {
+    mode: "modal",
     headerMode: "none",
     defaultNavigationOptions: {
+      gestureEnabled: false,
+      cardStyleInterpolator: ({ current: { progress: opacity } }) => {
+        return {
+          cardStyle: {
+            opacity
+          }
+        };
+      },
       cardStyle: {
         backgroundColor: "transparent"
       }

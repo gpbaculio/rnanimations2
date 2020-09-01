@@ -1,13 +1,20 @@
 import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated from "react-native-reanimated";
 import { Feather as Icon } from "@expo/vector-icons";
+import Animated, { Extrapolate, sub } from "react-native-reanimated";
 import { clamp, interpolateColor } from "react-native-redash";
 import { StyleGuide } from "../components";
 
-const { Extrapolate, interpolate, sub } = Animated;
-const grey = "rgb(186, 187, 199)";
-const primary = "rgb(56, 132, 225)";
+const grey = {
+  r: 186,
+  g: 187,
+  b: 199
+};
+const primary = {
+  r: 56,
+  g: 132,
+  b: 255
+};
 const size = 48;
 const marginTop = 32;
 const CONTAINER_HEIGHT = 100;
@@ -36,13 +43,12 @@ interface SearchProps {
 }
 
 export default memo(({ translateY }: SearchProps) => {
-  const chevronTranslateY = translateY;
-  const searchTranslateY = clamp(chevronTranslateY, 0, THRESHOLD);
+  const searchTranslateY = clamp(translateY, 0, THRESHOLD);
   const backgroundColor = interpolateColor(translateY, {
     inputRange: [CONTAINER_HEIGHT, THRESHOLD],
-    outputRange: [grey, primary]
-  }) as Animated.Node<number>;
-  const opacity = interpolate(translateY, {
+    outputRange: ["rgb(186, 187, 199)", "rgb(56, 132, 255)"]
+  });
+  const opacity = Animated.interpolate(translateY, {
     inputRange: [CONTAINER_HEIGHT, THRESHOLD],
     outputRange: [1, 0],
     extrapolate: Extrapolate.CLAMP
@@ -53,15 +59,23 @@ export default memo(({ translateY }: SearchProps) => {
       <Animated.View
         style={[
           styles.search,
-          {
-            backgroundColor,
-            transform: [{ translateY: searchTranslateY }]
-          }
+          { transform: [{ translateY: searchTranslateY }], backgroundColor }
         ]}
       >
+        {/* <View>
+          <Icon name="search" size={32} color="#babbc7" />
+        </View> */}
+        {/* <View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        > */}
         <Icon name="search" size={32} color="white" />
+        {/* </View> */}
       </Animated.View>
-      <Animated.View style={{ transform: [{ translateY: chevronTranslateY }] }}>
+      <Animated.View style={{ transform: [{ translateY }] }}>
         <Animated.View style={{ opacity }}>
           <Icon name="chevron-down" size={32} color="#babbc7" />
         </Animated.View>

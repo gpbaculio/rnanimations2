@@ -1,18 +1,17 @@
 import React, { useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+
+import { useMemoOne } from "use-memo-one";
 import Animated, {
   Transition,
   Transitioning,
   TransitioningView
 } from "react-native-reanimated";
-import { StyleSheet } from "react-native";
-
-import { useMemoOne } from "use-memo-one";
 import Content from "./Content";
 import ScrollView from "./ScrollView";
 import Search from "./Search";
 import SearchBox from "./SearchBox";
 
-const { Value } = Animated;
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -20,28 +19,33 @@ const styles = StyleSheet.create({
 });
 const transition = (
   <Transition.Together>
-    <Transition.In type="scale" durationMs={400} />
-    <Transition.Out type="scale" durationMs={400} />
+    <Transition.In durationMs={400} type="scale" />
+    <Transition.Out durationMs={400} type="scale" />
   </Transition.Together>
 );
-
 export default () => {
   const ref = useRef<TransitioningView>(null);
   const [search, setSearch] = useState(false);
-  const translateY = useMemoOne(() => new Value(0), []);
-  const showSearchBox = () => {
-    if (!search && ref.current) {
-      ref.current.animateNextTransition();
-      setSearch(true);
-    }
-  };
+  const translateY = useMemoOne(() => new Animated.Value(0), []);
   return (
     <Transitioning.View style={styles.container} {...{ transition, ref }}>
       <Search {...{ translateY }} />
-      <ScrollView onPull={showSearchBox} {...{ translateY }}>
+      <ScrollView
+        onPull={() => {
+          if (ref.current) ref.current.animateNextTransition();
+          setSearch(true);
+        }}
+        {...{ translateY }}
+      >
         <Content />
       </ScrollView>
-      <SearchBox visible={search} onRequestClose={() => setSearch(false)} />
+      <SearchBox
+        visible={search}
+        onRequestClose={() => {
+          if (ref.current) ref.current.animateNextTransition();
+          setSearch(false);
+        }}
+      />
     </Transitioning.View>
   );
 };

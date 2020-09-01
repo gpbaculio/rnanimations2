@@ -36,6 +36,10 @@ const assets: number[] = [
 const AppNavigator = createAppContainer(
   createStackNavigator(
     {
+      Things: {
+        screen: Things,
+        navigationOptions: { title: "Things" }
+      },
       Airbnb: {
         screen: Airbnb,
         navigationOptions: {
@@ -54,10 +58,6 @@ const AppNavigator = createAppContainer(
         navigationOptions: {
           title: "Liquid Swipe"
         }
-      },
-      Things: {
-        screen: Things,
-        navigationOptions: { title: "Things" }
       },
       Chrome: {
         screen: Chrome,

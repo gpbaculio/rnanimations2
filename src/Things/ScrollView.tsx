@@ -1,38 +1,45 @@
 import React, { ReactNode, memo, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import Animated, {
+  SpringUtils,
+  add,
+  and,
+  block,
+  call,
+  cond,
+  decay,
+  diff,
+  divide,
+  eq,
+  greaterOrEq,
+  lessOrEq,
+  min,
+  multiply,
+  neq,
+  not,
+  pow,
+  set,
+  spring,
+  startClock,
+  sub,
+  useCode
+} from "react-native-reanimated";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
-import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 import { snapPoint, verticalPanGestureHandler } from "react-native-redash";
 import { THRESHOLD } from "./Search";
 
-const {
-  SpringUtils,
-  Value,
-  Clock,
-  eq,
-  startClock,
-  set,
-  add,
-  and,
-  greaterOrEq,
-  lessOrEq,
-  cond,
-  decay,
-  block,
-  not,
-  spring,
-  abs,
-  multiply,
-  divide,
-  sub,
-  useCode,
-  call,
-  neq,
-  diff,
-  pow,
-  min
-} = Animated;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});
+
+interface ScrollViewProps {
+  children: ReactNode;
+  translateY: Animated.Value<number>;
+  onPull: () => void;
+}
 
 const friction = (ratio: Animated.Node<number>) =>
   multiply(0.52, pow(sub(1, ratio), 2));
@@ -44,7 +51,6 @@ interface WithScrollParams {
   containerHeight: number;
   contentHeight: number;
 }
-
 const withScroll = ({
   translationY,
   velocityY,
@@ -52,14 +58,14 @@ const withScroll = ({
   containerHeight,
   contentHeight
 }: WithScrollParams) => {
-  const clock = new Clock();
-  const delta = new Value(0);
-  const isSpringing = new Value(0);
+  const clock = new Animated.Clock();
+  const delta = new Animated.Value(0);
+  const isSpringing = new Animated.Value(0);
   const state = {
-    time: new Value(0),
-    position: new Value(0),
-    velocity: new Value(0),
-    finished: new Value(0)
+    time: new Animated.Value(0),
+    position: new Animated.Value(0),
+    velocity: new Animated.Value(0),
+    finished: new Animated.Value(0)
   };
   const upperBound = 0;
   const lowerBound = -1 * (contentHeight - containerHeight);
@@ -67,11 +73,8 @@ const withScroll = ({
     lessOrEq(state.position, upperBound),
     greaterOrEq(state.position, lowerBound)
   );
-  const config = {
-    ...SpringUtils.makeDefaultConfig(),
-    toValue: new Value(0)
-  };
-  const overscroll = sub(
+  const config = SpringUtils.makeDefaultConfig();
+  const overScroll = sub(
     state.position,
     cond(greaterOrEq(state.position, 0), upperBound, lowerBound)
   );
@@ -91,7 +94,7 @@ const withScroll = ({
               delta,
               multiply(
                 delta,
-                friction(min(divide(abs(overscroll), containerHeight), 1))
+                friction(min(divide(overScroll, containerHeight), 1))
               )
             )
           )
@@ -107,7 +110,7 @@ const withScroll = ({
           [
             set(isSpringing, 1),
             set(
-              config.toValue,
+              config.toValue as Animated.Value<number>,
               snapPoint(state.position, state.velocity, [
                 lowerBound,
                 upperBound
@@ -121,18 +124,6 @@ const withScroll = ({
     state.position
   ]);
 };
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
-
-interface ScrollViewProps {
-  children: ReactNode;
-  translateY: Animated.Value<number>;
-  onPull: () => void;
-}
-
 export default memo(({ children, translateY, onPull }: ScrollViewProps) => {
   const [containerHeight, setContainerHeight] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);

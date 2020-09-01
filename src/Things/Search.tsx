@@ -5,16 +5,6 @@ import Animated, { Extrapolate, sub } from "react-native-reanimated";
 import { clamp, interpolateColor } from "react-native-redash";
 import { StyleGuide } from "../components";
 
-const grey = {
-  r: 186,
-  g: 187,
-  b: 199
-};
-const primary = {
-  r: 56,
-  g: 132,
-  b: 255
-};
 const size = 48;
 const marginTop = 32;
 const CONTAINER_HEIGHT = 100;
